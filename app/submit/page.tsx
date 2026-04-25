@@ -43,6 +43,10 @@ export default function SubmitPage() {
     setLoading(true)
     setError(null)
     try {
+      const totalBytes = files.reduce((sum, f) => sum + f.size, 0)
+      if (totalBytes > 3.5 * 1024 * 1024) {
+        throw new Error(`Total file size (${(totalBytes / 1024 / 1024).toFixed(1)} MB) exceeds the 3.5 MB limit. Use smaller files or fewer files.`)
+      }
       const form = new FormData()
       files.forEach(f => form.append('files', f))
       const res = await fetch('/api/verify', { method: 'POST', body: form })
@@ -104,12 +108,18 @@ export default function SubmitPage() {
                 <div key={f.name} className="flex items-center gap-4 py-3 border-b border-white/[0.04]">
                   <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${isPendingFile(f.name) ? 'bg-gray-700' : 'bg-green-400 shadow-[0_0_5px_#00ff41]'}`} />
                   <span className="text-xs text-gray-400 flex-1 font-mono">{f.name}</span>
+                  <span className="text-[10px] text-gray-700 font-mono">{(f.size / 1024).toFixed(0)} KB</span>
                   <span className={`text-[10px] border px-2 py-0.5 tracking-[0.06em] ${isPendingFile(f.name) ? 'text-gray-700 border-white/5' : 'text-gray-600 border-white/[0.08]'}`}>
                     {isPendingFile(f.name) ? `${fileTag(f.name)} - flagged for review` : fileTag(f.name)}
                   </span>
                   <button onClick={() => removeFile(f.name)} className="text-gray-800 hover:text-gray-500 text-xs ml-1">&#10005;</button>
                 </div>
               ))}
+              <div className="pt-3 text-right">
+                <span className={`text-[10px] font-mono ${files.reduce((s, f) => s + f.size, 0) > 3.5 * 1024 * 1024 ? 'text-red-500/60' : 'text-gray-700'}`}>
+                  Total: {(files.reduce((s, f) => s + f.size, 0) / 1024 / 1024).toFixed(2)} MB / 3.5 MB
+                </span>
+              </div>
             </div>
           )}
 
