@@ -64,7 +64,7 @@ export default function SubmitPage() {
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Verification failed')
       const cert: SignedCertificate = data.certificate
-      sessionStorage.setItem(`cert-${cert.id}`, JSON.stringify(cert))
+      localStorage.setItem(`cert-${cert.id}`, JSON.stringify(cert))
       setCertId(cert.id)
       setLoading(false)
     } catch (err) {

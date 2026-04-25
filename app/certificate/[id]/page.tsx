@@ -24,7 +24,7 @@ export default function CertificatePage() {
   const [sealValid, setSealValid] = useState<boolean | null>(null)
 
   useEffect(() => {
-    const stored = sessionStorage.getItem(`cert-${id}`)
+    const stored = localStorage.getItem(`cert-${id}`)
     if (!stored) return
     const parsed: SignedCertificate = JSON.parse(stored)
     setCert(parsed)
