@@ -28,11 +28,11 @@ Analyze the evidence package and return a JSON object with this exact structure:
       "fileIndex": <index matching the order above, 0-based>,
       "type": <short human label like "Email correspondence" or "Personal notes" or "Quantitative analysis">,
       "strength": <"strong" | "corroborating" | "pending">,
-      "assessment": <2-3 sentences: what this document contributes, any consistency notes, any flags. NO names or identifiers.>
+      "assessment": <1-2 sentences max: what this document contributes and any key flags. NO names or identifiers.>
     }
   ],
   "keyFindings": [
-    <3-5 strings, each a single key finding. Privacy-preserving - no names, no institutions.>
+    <3 strings max, each under 20 words. Privacy-preserving - no names, no institutions.>
   ],
   "attributionLanguage": <A single publication-ready sentence. The quoted portion MUST be a verbatim excerpt copied word-for-word from the evidence text above — do not paraphrase, summarize, or fabricate. Choose the single most damning or revealing sentence that appears literally in the evidence. Format: "Verbatim sentence from the evidence," said a source whose evidence was independently verified through Objection's certification process [CERT-XXXXXXXX]. Use NO real names or institutional identifiers in the surrounding text.>
 }
@@ -50,7 +50,7 @@ Return ONLY the JSON object. No preamble, no explanation.`
 
   const message = await client.messages.create({
     model: 'claude-sonnet-4-6',
-    max_tokens: 2048,
+    max_tokens: 1500,
     messages: [{ role: 'user', content: prompt }],
   })
 
