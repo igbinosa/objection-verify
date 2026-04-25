@@ -2,7 +2,7 @@ export type EvidenceStrength = 'strong' | 'corroborating' | 'pending'
 
 export interface EvidenceItem {
   fileIndex: number
-  fileName: string       // used internally only - never sent to client
+  fileName?: string      // used internally only - never sent to client
   type: string           // human label e.g. "Email correspondence"
   strength: EvidenceStrength
   assessment: string     // privacy-preserving text from Claude
