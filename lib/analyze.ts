@@ -56,9 +56,10 @@ Return ONLY the JSON object. No preamble, no explanation.`
 
   const responseText = message.content[0].type === 'text' ? message.content[0].text : ''
 
-  const cleaned = responseText.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '').trim()
-
-  const analysis = JSON.parse(cleaned) as ClaudeAnalysis
+  // Extract JSON object even if Claude includes preamble text
+  const jsonMatch = responseText.match(/\{[\s\S]*\}/)
+  if (!jsonMatch) throw new Error('No JSON object found in Claude response')
+  const analysis = JSON.parse(jsonMatch[0]) as ClaudeAnalysis
 
   pending.forEach((f, i) => {
     analysis.evidenceBreakdown.push({
