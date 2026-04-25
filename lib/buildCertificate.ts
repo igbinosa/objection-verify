@@ -25,7 +25,7 @@ export function assembleCertificate(
 ): Certificate {
   const id = generateCertId()
   const issuedAt = new Date().toISOString()
-  const packageHash = buildPackageHash(files.map(f => f.hash))
+  const packageHash = buildPackageHash(files.filter(f => f.hash).map(f => f.hash))
 
   const evidenceBreakdown = analysis.evidenceBreakdown
     .filter(item => item.fileIndex >= 0 && item.fileIndex < files.length)

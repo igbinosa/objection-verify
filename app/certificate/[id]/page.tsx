@@ -92,7 +92,9 @@ export default function CertificatePage() {
               </div>
               <div className="flex-1">
                 <p className="text-xs text-gray-600 leading-relaxed font-sans">{ev.assessment}</p>
-                <p className="text-[10px] text-gray-800 mt-1.5 font-mono">sha256: {ev.hashPrefix}...</p>
+                {!ev.isPending && ev.hashPrefix && (
+                  <p className="text-[10px] text-gray-800 mt-1.5 font-mono">sha256: {ev.hashPrefix}...</p>
+                )}
               </div>
             </div>
           ))}
