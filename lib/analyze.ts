@@ -3,23 +3,7 @@ import { ClaudeAnalysis, ExtractedFile } from '@/types'
 
 const client = new Anthropic()
 
-export async function analyzeEvidence(files: ExtractedFile[]): Promise<ClaudeAnalysis> {
-  const analyzable = files.filter(f => !f.isPending && f.text)
-  const pending = files.filter(f => f.isPending)
-
-  const evidenceBlocks = analyzable.map((f, i) => (
-    `--- EVIDENCE ITEM ${i} (${f.originalName}) ---\n${f.text}\n`
-  )).join('\n')
-
-  const prompt = `You are an evidence verification analyst for a journalism platform. You have received an anonymous evidence package containing ${analyzable.length} document(s) and ${pending.length} pending file(s) (audio/media - not yet transcribed).
-
-Your job is to assess the credibility and coherence of the evidence WITHOUT identifying or exposing the source. You must never include names of individuals, institutions, or any identifying information in your output.
-
-EVIDENCE PACKAGE:
-${evidenceBlocks}
-
-Analyze the evidence package and return a JSON object with this exact structure:
-{
+const JSON_SCHEMA = `{
   "confidenceScore": <integer 0-100>,
   "tier": <"Insufficient" | "Preliminary" | "Corroborated" | "Strongly Corroborated">,
   "tierDescription": <one sentence describing the overall quality of corroboration>,
@@ -49,15 +33,54 @@ For directional analysis: if quantitative claims exist, note whether discrepanci
 
 Return ONLY the JSON object. No preamble, no explanation.`
 
+export async function analyzeEvidence(files: ExtractedFile[]): Promise<ClaudeAnalysis> {
+  const analyzable = files.filter(f => !f.isPending && (f.text || f.rawPdf))
+  const pending = files.filter(f => f.isPending)
+
+  const textFiles = analyzable.filter(f => f.text)
+  const pdfVisionFiles = analyzable.filter(f => !f.text && f.rawPdf)
+
+  const evidenceBlocks = textFiles.map((f, i) =>
+    `--- EVIDENCE ITEM ${i} (${f.originalName}) ---\n${f.text}\n`
+  ).join('\n')
+
+  const pdfLabels = pdfVisionFiles.map((f, i) =>
+    `--- EVIDENCE ITEM ${textFiles.length + i} (${f.originalName}) - read from attached PDF ---`
+  ).join('\n')
+
+  const evidenceSection = [evidenceBlocks, pdfLabels].filter(Boolean).join('\n')
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const contentBlocks: any[] = [
+    {
+      type: 'text',
+      text: `You are an evidence verification analyst for a journalism platform. You have received an anonymous evidence package containing ${analyzable.length} document(s) and ${pending.length} pending file(s) (audio/media - not yet transcribed).
+
+Your job is to assess the credibility and coherence of the evidence WITHOUT identifying or exposing the source. You must never include names of individuals, institutions, or any identifying information in your output.
+
+EVIDENCE PACKAGE:
+${evidenceSection}
+
+Analyze the evidence package and return a JSON object with this exact structure:
+${JSON_SCHEMA}`,
+    },
+  ]
+
+  for (const f of pdfVisionFiles) {
+    contentBlocks.push({
+      type: 'document',
+      source: { type: 'base64', media_type: 'application/pdf', data: f.rawPdf },
+    })
+  }
+
   const message = await client.messages.create({
     model: 'claude-sonnet-4-6',
     max_tokens: 1500,
-    messages: [{ role: 'user', content: prompt }],
+    messages: [{ role: 'user', content: contentBlocks }],
   })
 
   const responseText = message.content[0].type === 'text' ? message.content[0].text : ''
 
-  // Extract JSON object even if Claude includes preamble text
   const jsonMatch = responseText.match(/\{[\s\S]*\}/)
   if (!jsonMatch) throw new Error('No JSON object found in Claude response')
   const analysis = JSON.parse(jsonMatch[0]) as ClaudeAnalysis

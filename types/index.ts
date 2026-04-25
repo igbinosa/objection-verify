@@ -36,7 +36,8 @@ export interface SignedCertificate extends Certificate {
 export interface ExtractedFile {
   originalName: string
   mimeType: string
-  text: string | null               // null for audio/image
+  text: string | null               // null for audio/image or scanned PDF
+  rawPdf?: string                   // base64 PDF bytes - set when text extraction fails on a PDF
   hash: string                      // sha256 hex
   isPending: boolean
 }

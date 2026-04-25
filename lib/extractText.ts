@@ -34,10 +34,14 @@ export async function extractText(
       const mod = await import('pdf-parse') as unknown as any
       const pdfParse: (buf: Buffer) => Promise<{ text: string }> = mod.default ?? mod
       const data = await pdfParse(buf)
-      return { originalName: name, mimeType: mime, text: data.text, hash, isPending: false }
+      if (data.text && data.text.trim().length > 0) {
+        return { originalName: name, mimeType: mime, text: data.text, hash, isPending: false }
+      }
     } catch {
-      return { originalName: name, mimeType: mime, text: null, hash, isPending: true }
+      // fall through to vision path
     }
+    // Scanned PDF or empty text - pass raw bytes to Claude vision
+    return { originalName: name, mimeType: mime, text: null, rawPdf: buf.toString('base64'), hash, isPending: false }
   }
 
   if (kind === 'docx') {

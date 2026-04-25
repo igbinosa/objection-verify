@@ -36,13 +36,12 @@ export async function POST(req: NextRequest) {
       extracted.push({ originalName: name, mimeType: '', text: null, hash: '', isPending: true })
     }
 
-    const hasText = extracted.some(f => f.text && f.text.trim().length > 0)
-    if (!hasText) {
-      const pdfCount = files.filter(f => f.name.toLowerCase().endsWith('.pdf')).length
-      const msg = pdfCount > 0
-        ? 'No readable text could be extracted from the uploaded PDFs. They may be scanned images rather than text-based documents. Try copying the text and uploading as .txt files instead.'
-        : 'No readable text found in uploaded files. Upload .txt, .pdf, or .docx documents with actual text content.'
-      return NextResponse.json({ error: msg }, { status: 422 })
+    const hasAnalyzable = extracted.some(f => (f.text && f.text.trim().length > 0) || f.rawPdf)
+    if (!hasAnalyzable) {
+      return NextResponse.json(
+        { error: 'No analyzable content found in uploaded files. Upload .txt, .pdf, or .docx documents.' },
+        { status: 422 }
+      )
     }
 
     const analysis = await analyzeEvidence(extracted)
