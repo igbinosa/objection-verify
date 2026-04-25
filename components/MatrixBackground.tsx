@@ -34,38 +34,38 @@ export default function MatrixBackground() {
       const barY = cy - s * 0.52
       const barW = s * 0.88
 
-      mctx.lineWidth = 22
+      mctx.lineWidth = 38
       mctx.beginPath(); mctx.moveTo(cx, cy + s * 0.72); mctx.lineTo(cx, barY); mctx.stroke()
 
-      mctx.lineWidth = 28
+      mctx.lineWidth = 44
       mctx.beginPath(); mctx.moveTo(cx - s * 0.38, cy + s * 0.72); mctx.lineTo(cx + s * 0.38, cy + s * 0.72); mctx.stroke()
 
-      mctx.lineWidth = 18
+      mctx.lineWidth = 30
       mctx.beginPath(); mctx.moveTo(cx - s * 0.25, cy + s * 0.72); mctx.lineTo(cx - s * 0.38, cy + s * 0.88); mctx.stroke()
       mctx.beginPath(); mctx.moveTo(cx + s * 0.25, cy + s * 0.72); mctx.lineTo(cx + s * 0.38, cy + s * 0.88); mctx.stroke()
 
-      mctx.lineWidth = 18
+      mctx.lineWidth = 30
       mctx.beginPath(); mctx.moveTo(cx - barW * 0.5, barY + tilt); mctx.lineTo(cx + barW * 0.5, barY - tilt); mctx.stroke()
 
-      mctx.lineWidth = 14
+      mctx.lineWidth = 24
       mctx.beginPath(); mctx.arc(cx, barY, s * 0.04, 0, Math.PI * 2); mctx.stroke()
 
       const lx = cx - barW * 0.5, lTopY = barY + tilt, lPanY = cy + s * 0.18
-      mctx.lineWidth = 10
+      mctx.lineWidth = 20
       mctx.beginPath(); mctx.moveTo(lx, lTopY); mctx.lineTo(lx - s * 0.08, lPanY - s * 0.06); mctx.stroke()
       mctx.beginPath(); mctx.moveTo(lx, lTopY); mctx.lineTo(lx + s * 0.08, lPanY - s * 0.06); mctx.stroke()
-      mctx.lineWidth = 16
+      mctx.lineWidth = 28
       mctx.beginPath(); mctx.arc(lx, lPanY, s * 0.22, Math.PI * 0.08, Math.PI * 0.92); mctx.stroke()
-      mctx.lineWidth = 12
+      mctx.lineWidth = 22
       mctx.beginPath(); mctx.moveTo(lx - s * 0.22, lPanY); mctx.lineTo(lx + s * 0.22, lPanY); mctx.stroke()
 
       const rx = cx + barW * 0.5, rTopY = barY - tilt, rPanY = cy - s * 0.06
-      mctx.lineWidth = 10
+      mctx.lineWidth = 20
       mctx.beginPath(); mctx.moveTo(rx, rTopY); mctx.lineTo(rx - s * 0.08, rPanY - s * 0.06); mctx.stroke()
       mctx.beginPath(); mctx.moveTo(rx, rTopY); mctx.lineTo(rx + s * 0.08, rPanY - s * 0.06); mctx.stroke()
-      mctx.lineWidth = 16
+      mctx.lineWidth = 28
       mctx.beginPath(); mctx.arc(rx, rPanY, s * 0.22, Math.PI * 0.08, Math.PI * 0.92); mctx.stroke()
-      mctx.lineWidth = 12
+      mctx.lineWidth = 22
       mctx.beginPath(); mctx.moveTo(rx - s * 0.22, rPanY); mctx.lineTo(rx + s * 0.22, rPanY); mctx.stroke()
     }
 
@@ -88,7 +88,7 @@ export default function MatrixBackground() {
     window.addEventListener('resize', setup)
 
     const interval = setInterval(() => {
-      ctx.fillStyle = 'rgba(0,0,0,0.048)'
+      ctx.fillStyle = 'rgba(0,0,0,0.07)'
       ctx.fillRect(0, 0, W, H)
       for (let i = 0; i < drops.length; i++) {
         const x = i * fontSize, y = drops[i] * fontSize
@@ -96,9 +96,11 @@ export default function MatrixBackground() {
         const r = Math.random()
         const char = chars[Math.floor(Math.random() * chars.length)]
         if (inScales) {
-          ctx.fillStyle = r > 0.97 ? '#88ffaa' : r > 0.82 ? '#00cc33' : r > 0.55 ? '#007722' : '#004411'
+          // Scales region: bright green — silhouette pops against the dark rain
+          ctx.fillStyle = r > 0.96 ? '#ccffdd' : r > 0.75 ? '#00ff41' : r > 0.45 ? '#00cc33' : '#007722'
         } else {
-          ctx.fillStyle = r > 0.985 ? '#ccffcc' : r > 0.93 ? '#00ff41' : r > 0.75 ? '#004410' : '#002208'
+          // Outside: nearly invisible, occasional dim flicker
+          ctx.fillStyle = r > 0.995 ? '#00ff41' : r > 0.93 ? '#002d0e' : '#000e04'
         }
         ctx.font = `${fontSize}px monospace`
         ctx.fillText(char, x, y)
@@ -116,7 +118,7 @@ export default function MatrixBackground() {
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 w-full h-full z-0 pointer-events-none opacity-[0.13]"
+      className="fixed inset-0 w-full h-full z-0 pointer-events-none"
     />
   )
 }
