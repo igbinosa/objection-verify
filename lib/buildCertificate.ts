@@ -43,10 +43,8 @@ export function assembleCertificate(
       }
     })
 
-  const attributionLanguage = analysis.attributionLanguage.replace(
-    /\[CERT-[A-Z0-9]+\]/,
-    `[${id}]`
-  )
+  const quote = (analysis.verbatimQuote || analysis.attributionLanguage).replace(/^["']|["']$/g, '')
+  const attributionLanguage = `"${quote}," said a source whose evidence was independently verified through Objection's certification process [${id}].`
 
   return {
     id,

@@ -52,5 +52,6 @@ export interface ClaudeAnalysis {
     assessment: string
   }>
   keyFindings: string[]
+  verbatimQuote: string
   attributionLanguage: string
 }

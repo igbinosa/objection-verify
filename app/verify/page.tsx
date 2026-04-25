@@ -33,9 +33,9 @@ export default function VerifyPage() {
       } else {
         setStatus('invalid')
       }
-    } catch {
+    } catch (err) {
       setStatus('error')
-      setErrorMsg('Could not parse input. Paste the full certificate JSON.')
+      setErrorMsg(err instanceof Error ? err.message : 'Could not parse input. Paste the full certificate JSON.')
     }
   }
 
@@ -119,7 +119,7 @@ export default function VerifyPage() {
         {/* Sidebar */}
         <div className="space-y-3">
           {[
-            { title: '// How to get the JSON', body: 'On any certificate page, open browser DevTools (F12), go to Console, and run: JSON.stringify(JSON.parse(sessionStorage.getItem(\'cert-\' + location.pathname.split(\'/\').pop())))' },
+            { title: '// How to get the JSON', body: 'On the certificate page, open DevTools (F12 → Console) and run:\n\nJSON.stringify(JSON.parse(sessionStorage.getItem("cert-" + location.pathname.split("/").pop())))\n\nCopy the full output string.' },
             { title: '// What gets verified', body: 'The Ed25519 signature covers the certificate ID, score, tier, all evidence assessments, key findings, attribution language, and package hash. Any modification to any field breaks the seal.' },
             { title: '// Public key', body: 'The verification public key is available at /api/public-key. You can verify certificates offline without this server using any Ed25519-compatible tool.' },
           ].map(card => (

@@ -34,7 +34,8 @@ Analyze the evidence package and return a JSON object with this exact structure:
   "keyFindings": [
     <3 strings max, each under 20 words. Privacy-preserving - no names, no institutions.>
   ],
-  "attributionLanguage": <Copy one sentence verbatim from the EVIDENCE PACKAGE above — the single most damning line. It must appear word-for-word in the text above. Wrap it in this exact format: "PASTE_VERBATIM_SENTENCE_HERE," said a source whose evidence was independently verified through Objection's certification process [CERT-XXXXXXXX]. Do not invent, paraphrase, or improve the quote. No names or institutions in the surrounding text.>
+  "verbatimQuote": <Scan the EVIDENCE PACKAGE above and find the single most damning sentence. Copy it here character-for-character exactly as it appears in the text — do not change a single word.>,
+  "attributionLanguage": <Take the verbatimQuote field above and wrap it in this format exactly: "[verbatimQuote]," said a source whose evidence was independently verified through Objection's certification process [CERT-XXXXXXXX]. No names or institutions.>
 }
 
 Scoring guide:
