@@ -118,16 +118,41 @@ export default function VerifyPage() {
 
         {/* Sidebar */}
         <div className="space-y-3">
-          {[
-            { title: '// How to get the JSON', body: 'On the certificate page, open DevTools (F12 → Console) and run:\n\nJSON.stringify(JSON.parse(localStorage.getItem("cert-" + location.pathname.split("/").pop())))\n\nCopy the full output string.' },
-            { title: '// What gets verified', body: 'The Ed25519 signature covers the certificate ID, score, tier, all evidence assessments, key findings, attribution language, and package hash. Any modification to any field breaks the seal.' },
-            { title: '// Public key', body: 'The verification public key is available at /api/public-key. You can verify certificates offline without this server using any Ed25519-compatible tool.' },
-          ].map(card => (
-            <div key={card.title} className="bg-black/50 border border-white/[0.06] p-5">
-              <p className="text-[10px] text-green-400/40 uppercase tracking-[0.15em] mb-3">{card.title}</p>
-              <p className="text-xs text-gray-600 leading-relaxed font-mono">{card.body}</p>
-            </div>
-          ))}
+          <div className="bg-black/50 border border-white/[0.06] p-5">
+            <p className="text-[10px] text-green-400/40 uppercase tracking-[0.15em] mb-4">// How to verify</p>
+            <ol className="space-y-3">
+              {[
+                'Open the certificate you want to verify.',
+                'Scroll to the bottom and click "Copy Certificate JSON".',
+                'Come back to this page.',
+                'Paste it into the box on the left.',
+                'Click Verify Seal.',
+              ].map((step, i) => (
+                <li key={i} className="flex gap-3 text-xs text-gray-500 font-sans leading-relaxed">
+                  <span className="text-green-400/50 font-mono flex-shrink-0">{i + 1}.</span>
+                  {step}
+                </li>
+              ))}
+            </ol>
+          </div>
+
+          <div className="bg-black/50 border border-white/[0.06] p-5">
+            <p className="text-[10px] text-green-400/40 uppercase tracking-[0.15em] mb-3">// What it checks</p>
+            <p className="text-xs text-gray-500 font-sans leading-relaxed">
+              Every certificate is signed with a private key that only Objection&apos;s server holds.
+              If anyone changes even one word — the score, the findings, anything — the signature
+              breaks and verification fails.
+            </p>
+          </div>
+
+          <div className="bg-black/50 border border-white/[0.06] p-5">
+            <p className="text-[10px] text-green-400/40 uppercase tracking-[0.15em] mb-3">// Verify without us</p>
+            <p className="text-xs text-gray-500 font-sans leading-relaxed">
+              You don&apos;t have to trust Objection. Download the public key at{' '}
+              <a href="/api/public-key" target="_blank" className="text-green-400/60 hover:text-green-400">/api/public-key</a>{' '}
+              and verify any certificate yourself using any Ed25519 tool — no internet required.
+            </p>
+          </div>
         </div>
       </div>
     </main>

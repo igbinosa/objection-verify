@@ -21,6 +21,7 @@ export default function CertificatePage() {
   const { id } = useParams<{ id: string }>()
   const [cert, setCert] = useState<SignedCertificate | null>(null)
   const [copied, setCopied] = useState(false)
+  const [copiedJson, setCopiedJson] = useState(false)
   const [sealValid, setSealValid] = useState<boolean | null>(null)
 
   useEffect(() => {
@@ -43,6 +44,13 @@ export default function CertificatePage() {
     navigator.clipboard.writeText(cert.attributionLanguage)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
+  }
+
+  const copyJson = () => {
+    if (!cert) return
+    navigator.clipboard.writeText(JSON.stringify(cert))
+    setCopiedJson(true)
+    setTimeout(() => setCopiedJson(false), 2000)
   }
 
   if (!cert) {
@@ -144,18 +152,26 @@ export default function CertificatePage() {
         </div>
 
         {/* Footer */}
-        <div className="px-10 py-5 border-t border-white/[0.04] flex justify-between items-end">
-          <div>
-            <p className="text-[10px] text-gray-600 font-mono truncate max-w-xs">
-              pkg: sha256:{cert.packageHash.slice(0, 40)}...
-            </p>
-            {cert.signature && (
-              <p className="text-[10px] text-gray-600 font-mono mt-1">
-                sig: {cert.signature.slice(0, 48)}...
+        <div className="px-10 py-5 border-t border-white/[0.04]">
+          <div className="flex justify-between items-end mb-4">
+            <div>
+              <p className="text-[10px] text-gray-600 font-mono truncate max-w-xs">
+                pkg: sha256:{cert.packageHash.slice(0, 40)}...
               </p>
-            )}
+              {cert.signature && (
+                <p className="text-[10px] text-gray-600 font-mono mt-1">
+                  sig: {cert.signature.slice(0, 48)}...
+                </p>
+              )}
+            </div>
+            <p className="text-[10px] text-gray-700 flex-shrink-0 ml-4">objection.ai/verify/{cert.id}</p>
           </div>
-          <p className="text-[10px] text-gray-700 flex-shrink-0 ml-4">objection.ai/verify/{cert.id}</p>
+          <button
+            onClick={copyJson}
+            className="w-full text-[10px] text-gray-600 uppercase tracking-[0.12em] border border-white/10 px-4 py-2 hover:border-green-400/30 hover:text-green-400 transition-all"
+          >
+            {copiedJson ? '[ JSON Copied - Paste into Verify page ]' : '[ Copy Certificate JSON ]'}
+          </button>
         </div>
       </div>
 
