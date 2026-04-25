@@ -28,15 +28,23 @@ export async function extractText(
   }
 
   if (kind === 'pdf') {
-    const pdfParse = (await import('pdf-parse')).default
-    const data = await pdfParse(buf)
-    return { originalName: name, mimeType: mime, text: data.text, hash, isPending: false }
+    try {
+      const pdfParse = (await import('pdf-parse')).default
+      const data = await pdfParse(buf)
+      return { originalName: name, mimeType: mime, text: data.text, hash, isPending: false }
+    } catch {
+      return { originalName: name, mimeType: mime, text: null, hash, isPending: true }
+    }
   }
 
   if (kind === 'docx') {
-    const mammoth = await import('mammoth')
-    const result = await mammoth.extractRawText({ buffer: buf })
-    return { originalName: name, mimeType: mime, text: result.value, hash, isPending: false }
+    try {
+      const mammoth = await import('mammoth')
+      const result = await mammoth.extractRawText({ buffer: buf })
+      return { originalName: name, mimeType: mime, text: result.value || null, hash, isPending: false }
+    } catch {
+      return { originalName: name, mimeType: mime, text: null, hash, isPending: true }
+    }
   }
 
   return { originalName: name, mimeType: mime, text: null, hash, isPending: true }
