@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import MatrixBackground from '@/components/MatrixBackground'
+import Nav from '@/components/Nav'
 
 export const metadata: Metadata = {
   title: 'Objection - Source Verification',
@@ -13,6 +14,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-screen bg-black text-gray-300 relative">
         <MatrixBackground />
         <div className="relative z-20">
+          <Nav />
           {children}
         </div>
       </body>
