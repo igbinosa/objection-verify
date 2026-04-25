@@ -19,6 +19,7 @@ export default function SubmitPage() {
   const [files, setFiles] = useState<File[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [certId, setCertId] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
 
@@ -64,7 +65,8 @@ export default function SubmitPage() {
       if (!res.ok) throw new Error(data.error || 'Verification failed')
       const cert: SignedCertificate = data.certificate
       sessionStorage.setItem(`cert-${cert.id}`, JSON.stringify(cert))
-      router.push(`/certificate/${cert.id}`)
+      setCertId(cert.id)
+      setLoading(false)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong')
       setLoading(false)
@@ -132,17 +134,36 @@ export default function SubmitPage() {
             <p className="text-red-500/70 text-xs mb-4 font-mono border border-red-500/20 px-4 py-3">&gt; Error: {error}</p>
           )}
 
-          <button
-            onClick={handleSubmit}
-            disabled={files.length === 0 || loading}
-            className="w-full border border-green-400 text-green-400 py-3 text-xs tracking-[0.15em] uppercase disabled:opacity-30 disabled:cursor-not-allowed hover:bg-green-400/5 transition-colors shadow-[0_0_12px_rgba(0,255,65,0.13)]"
-          >
-            {loading ? '[ Analyzing... ]' : '> Verify Evidence Package'}
-          </button>
-          {loading && (
-            <p className="text-[11px] text-gray-700 mt-3 text-center font-mono">
-              Running cross-document coherence analysis. This may take 20-30 seconds.
-            </p>
+          {certId ? (
+            <div className="border border-green-400/30 bg-green-400/[0.03] p-6 text-center">
+              <p className="text-[11px] text-green-400 tracking-[0.16em] uppercase font-mono mb-1" style={{ textShadow: '0 0 8px rgba(0,255,65,0.4)' }}>
+                &#10003; Certificate issued
+              </p>
+              <p className="text-[10px] text-gray-600 font-mono mb-5">{certId}</p>
+              <a
+                href={`/certificate/${certId}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block border border-green-400 text-green-400 px-8 py-3 text-xs tracking-[0.15em] uppercase hover:bg-green-400/5 transition-colors shadow-[0_0_12px_rgba(0,255,65,0.13)]"
+              >
+                View Certificate &rarr;
+              </a>
+            </div>
+          ) : (
+            <>
+              <button
+                onClick={handleSubmit}
+                disabled={files.length === 0 || loading}
+                className="w-full border border-green-400 text-green-400 py-3 text-xs tracking-[0.15em] uppercase disabled:opacity-30 disabled:cursor-not-allowed hover:bg-green-400/5 transition-colors shadow-[0_0_12px_rgba(0,255,65,0.13)]"
+              >
+                {loading ? '[ Analyzing... ]' : '> Verify Evidence Package'}
+              </button>
+              {loading && (
+                <p className="text-[11px] text-gray-700 mt-3 text-center font-mono">
+                  Running cross-document coherence analysis. This may take 20-30 seconds.
+                </p>
+              )}
+            </>
           )}
         </div>
 
