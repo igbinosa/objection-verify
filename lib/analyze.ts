@@ -34,7 +34,7 @@ Analyze the evidence package and return a JSON object with this exact structure:
   "keyFindings": [
     <3-5 strings, each a single key finding. Privacy-preserving - no names, no institutions.>
   ],
-  "attributionLanguage": <A single publication-ready sentence a journalist can quote directly. Format: "Direct quote from evidence," said a source whose evidence was independently verified through Objection's certification process [CERT-XXXXXXXX]. Use NO real names.>
+  "attributionLanguage": <A single publication-ready sentence. The quoted portion MUST be a verbatim excerpt copied word-for-word from the evidence text above — do not paraphrase, summarize, or fabricate. Choose the single most damning or revealing sentence that appears literally in the evidence. Format: "Verbatim sentence from the evidence," said a source whose evidence was independently verified through Objection's certification process [CERT-XXXXXXXX]. Use NO real names or institutional identifiers in the surrounding text.>
 }
 
 Scoring guide:
