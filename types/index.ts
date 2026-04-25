@@ -30,7 +30,7 @@ export interface Certificate {
 }
 
 export interface SignedCertificate extends Certificate {
-  signature: string                 // HMAC-SHA256 of canonical cert fields
+  signature: string                 // Ed25519 signature (base64) - verifiable with public key
 }
 
 export interface ExtractedFile {
