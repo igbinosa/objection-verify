@@ -47,6 +47,7 @@ export default function Nav() {
   const links = [
     { href: '/', label: 'Home' },
     { href: '/submit', label: 'Submit Evidence' },
+    { href: '/verify', label: 'Verify Certificate' },
   ]
 
   return (
