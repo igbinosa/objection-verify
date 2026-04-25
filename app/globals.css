@@ -1,6 +1,10 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  --spacing-15: 60px;
+  --font-family-mono: "Courier New", Courier, monospace;
+  --font-family-sans: -apple-system, BlinkMacSystemFont, sans-serif;
+}
 
 @keyframes blink {
   0%, 100% { opacity: 1; }
