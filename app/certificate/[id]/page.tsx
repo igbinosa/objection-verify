@@ -71,6 +71,13 @@ export default function CertificatePage() {
           <div className="text-right">
             <p className="text-xs text-green-400 tracking-[0.1em]">{cert.id}</p>
             <p className="text-[10px] text-gray-700 mt-1">{issuedStr}</p>
+            <div className="mt-2">
+              {sealValid === null && <p className="text-[10px] text-gray-700 font-mono">verifying seal...</p>}
+              {sealValid === true && (
+                <p className="text-[10px] text-green-400 font-mono" style={{ textShadow: '0 0 6px rgba(0,255,65,0.4)' }}>&#10003; cryptographic seal intact</p>
+              )}
+              {sealValid === false && <p className="text-[10px] text-red-500/70 font-mono">&#10005; seal invalid</p>}
+            </div>
           </div>
         </div>
 
@@ -137,33 +144,18 @@ export default function CertificatePage() {
         </div>
 
         {/* Footer */}
-        <div className="px-10 py-5 border-t border-white/[0.04]">
-          <div className="flex justify-between items-start gap-4 mb-3">
-            <div>
-              <p className="text-[10px] text-gray-600 font-mono truncate max-w-xs">
-                pkg: sha256:{cert.packageHash.slice(0, 40)}...
+        <div className="px-10 py-5 border-t border-white/[0.04] flex justify-between items-end">
+          <div>
+            <p className="text-[10px] text-gray-600 font-mono truncate max-w-xs">
+              pkg: sha256:{cert.packageHash.slice(0, 40)}...
+            </p>
+            {cert.signature && (
+              <p className="text-[10px] text-gray-600 font-mono mt-1">
+                sig: {cert.signature.slice(0, 48)}...
               </p>
-              {cert.signature && (
-                <p className="text-[10px] text-gray-600 font-mono mt-1 break-all">
-                  sig: {cert.signature.slice(0, 48)}...
-                </p>
-              )}
-            </div>
-            <div className="text-right flex-shrink-0">
-              {sealValid === null && (
-                <p className="text-[10px] text-gray-600 font-mono">verifying seal...</p>
-              )}
-              {sealValid === true && (
-                <p className="text-[10px] text-green-400 font-mono" style={{ textShadow: '0 0 6px rgba(0,255,65,0.4)' }}>
-                  &#10003; cryptographic seal intact
-                </p>
-              )}
-              {sealValid === false && (
-                <p className="text-[10px] text-red-500/70 font-mono">&#10005; seal invalid</p>
-              )}
-              <p className="text-[10px] text-gray-700 mt-1">objection.ai/verify/{cert.id}</p>
-            </div>
+            )}
           </div>
+          <p className="text-[10px] text-gray-700 flex-shrink-0 ml-4">objection.ai/verify/{cert.id}</p>
         </div>
       </div>
 
