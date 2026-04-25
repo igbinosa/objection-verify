@@ -78,7 +78,7 @@ export default function MatrixBackground() {
 
     function setup() {
       W = window.innerWidth; H = window.innerHeight
-      canvas.width = W; canvas.height = H
+      canvas!.width = W; canvas!.height = H
       drops = Array(Math.floor(W / fontSize)).fill(1).map(() => Math.floor(Math.random() * H / fontSize))
       drawScalesMask(W, H)
       maskData = mctx.getImageData(0, 0, W, H)

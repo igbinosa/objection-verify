@@ -29,7 +29,10 @@ export async function extractText(
 
   if (kind === 'pdf') {
     try {
-      const pdfParse = (await import('pdf-parse')).default
+      // pdf-parse v2 ESM export shape varies; escape hatch with try-catch safety net
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const mod = await import('pdf-parse') as unknown as any
+      const pdfParse: (buf: Buffer) => Promise<{ text: string }> = mod.default ?? mod
       const data = await pdfParse(buf)
       return { originalName: name, mimeType: mime, text: data.text, hash, isPending: false }
     } catch {
