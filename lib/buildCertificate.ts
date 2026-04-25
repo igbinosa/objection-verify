@@ -27,19 +27,21 @@ export function assembleCertificate(
   const issuedAt = new Date().toISOString()
   const packageHash = buildPackageHash(files.map(f => f.hash))
 
-  const evidenceBreakdown = analysis.evidenceBreakdown.map(item => {
-    const file = files[item.fileIndex]
-    return {
-      fileIndex: item.fileIndex,
-      fileName: file.originalName,
-      type: item.type,
-      strength: item.strength,
-      assessment: item.assessment,
-      hashPrefix: file.hash.slice(0, 20),
-      fullHash: file.hash,
-      isPending: file.isPending,
-    }
-  })
+  const evidenceBreakdown = analysis.evidenceBreakdown
+    .filter(item => item.fileIndex >= 0 && item.fileIndex < files.length)
+    .map(item => {
+      const file = files[item.fileIndex]
+      return {
+        fileIndex: item.fileIndex,
+        fileName: file.originalName,
+        type: item.type,
+        strength: item.strength,
+        assessment: item.assessment,
+        hashPrefix: file.hash.slice(0, 20),
+        fullHash: file.hash,
+        isPending: file.isPending,
+      }
+    })
 
   const attributionLanguage = analysis.attributionLanguage.replace(
     /\[CERT-[A-Z0-9]+\]/,
