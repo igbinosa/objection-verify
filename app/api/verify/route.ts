@@ -56,7 +56,8 @@ export async function POST(req: NextRequest) {
     const signature = signCertificate(clientCertificate)
     return NextResponse.json({ certificate: { ...clientCertificate, signature } })
   } catch (err) {
-    console.error('Verify route error:', err)
-    return NextResponse.json({ error: 'Verification failed' }, { status: 500 })
+    const message = err instanceof Error ? err.message : String(err)
+    console.error('Verify route error:', message)
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }
