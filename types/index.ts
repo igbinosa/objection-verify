@@ -29,6 +29,10 @@ export interface Certificate {
   packageHash: string               // sha256 of all file hashes concatenated
 }
 
+export interface SignedCertificate extends Certificate {
+  signature: string                 // HMAC-SHA256 of canonical cert fields
+}
+
 export interface ExtractedFile {
   originalName: string
   mimeType: string

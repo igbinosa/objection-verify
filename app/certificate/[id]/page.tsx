@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
-import { Certificate, EvidenceStrength } from '@/types'
+import { SignedCertificate, EvidenceStrength } from '@/types'
 
 const TIER_COLORS: Record<string, string> = {
   'Strongly Corroborated': 'text-green-400',
@@ -19,12 +19,23 @@ const DOT_COLORS: Record<EvidenceStrength, string> = {
 
 export default function CertificatePage() {
   const { id } = useParams<{ id: string }>()
-  const [cert, setCert] = useState<Certificate | null>(null)
+  const [cert, setCert] = useState<SignedCertificate | null>(null)
   const [copied, setCopied] = useState(false)
+  const [sealValid, setSealValid] = useState<boolean | null>(null)
 
   useEffect(() => {
     const stored = sessionStorage.getItem(`cert-${id}`)
-    if (stored) setCert(JSON.parse(stored))
+    if (!stored) return
+    const parsed: SignedCertificate = JSON.parse(stored)
+    setCert(parsed)
+    fetch('/api/check', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ certificate: parsed }),
+    })
+      .then(r => r.json())
+      .then(d => setSealValid(d.valid))
+      .catch(() => setSealValid(false))
   }, [id])
 
   const copyAttribution = () => {
@@ -126,13 +137,31 @@ export default function CertificatePage() {
         </div>
 
         {/* Footer */}
-        <div className="px-10 py-5 flex justify-between items-center">
-          <p className="text-[10px] text-gray-800 font-mono truncate max-w-xs">
-            pkg: sha256:{cert.packageHash.slice(0, 40)}...
-          </p>
-          <p className="text-[10px] text-gray-700 flex-shrink-0 ml-4">
-            objection.ai/verify/{cert.id}
-          </p>
+        <div className="px-10 py-5 border-t border-white/[0.04] flex justify-between items-center gap-4">
+          <div>
+            <p className="text-[10px] text-gray-800 font-mono truncate max-w-xs">
+              pkg: sha256:{cert.packageHash.slice(0, 40)}...
+            </p>
+            {cert.signature && (
+              <p className="text-[10px] text-gray-800 font-mono mt-1">
+                sig: {cert.signature.slice(0, 32)}...
+              </p>
+            )}
+          </div>
+          <div className="text-right flex-shrink-0">
+            {sealValid === null && (
+              <p className="text-[10px] text-gray-700 font-mono">verifying seal...</p>
+            )}
+            {sealValid === true && (
+              <p className="text-[10px] text-green-400 font-mono" style={{ textShadow: '0 0 6px rgba(0,255,65,0.4)' }}>
+                &#10003; cryptographic seal intact
+              </p>
+            )}
+            {sealValid === false && (
+              <p className="text-[10px] text-red-500/70 font-mono">&#10005; seal invalid</p>
+            )}
+            <p className="text-[10px] text-gray-700 mt-1">objection.ai/verify/{cert.id}</p>
+          </div>
         </div>
       </div>
 

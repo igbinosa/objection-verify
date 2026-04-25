@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { extractText } from '@/lib/extractText'
 import { analyzeEvidence } from '@/lib/analyze'
 import { assembleCertificate } from '@/lib/buildCertificate'
+import { signCertificate } from '@/lib/sign'
 import { ExtractedFile } from '@/types'
 
 export const maxDuration = 60
@@ -52,7 +53,8 @@ export async function POST(req: NextRequest) {
       evidenceBreakdown: certificate.evidenceBreakdown.map(({ fileName: _fn, ...rest }) => rest),
     }
 
-    return NextResponse.json({ certificate: clientCertificate })
+    const signature = signCertificate(clientCertificate)
+    return NextResponse.json({ certificate: { ...clientCertificate, signature } })
   } catch (err) {
     console.error('Verify route error:', err)
     return NextResponse.json({ error: 'Verification failed' }, { status: 500 })

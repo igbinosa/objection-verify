@@ -1,7 +1,7 @@
 'use client'
 import { useState, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { Certificate } from '@/types'
+import { SignedCertificate } from '@/types'
 
 const ACCEPTED = '.txt,.pdf,.docx,.doc,.mp3,.wav,.png,.jpg,.jpeg'
 
@@ -62,7 +62,7 @@ export default function SubmitPage() {
       }
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Verification failed')
-      const cert: Certificate = data.certificate
+      const cert: SignedCertificate = data.certificate
       sessionStorage.setItem(`cert-${cert.id}`, JSON.stringify(cert))
       router.push(`/certificate/${cert.id}`)
     } catch (err) {
