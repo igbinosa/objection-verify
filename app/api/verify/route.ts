@@ -10,12 +10,16 @@ export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData()
     const files = formData.getAll('files') as File[]
+    const pendingNamesRaw = formData.get('pendingNames')
+    const pendingNames: string[] = pendingNamesRaw
+      ? JSON.parse(pendingNamesRaw as string)
+      : []
 
-    if (!files || files.length === 0) {
+    if (files.length === 0 && pendingNames.length === 0) {
       return NextResponse.json({ error: 'No files provided' }, { status: 400 })
     }
 
-    if (files.length > 10) {
+    if (files.length + pendingNames.length > 10) {
       return NextResponse.json({ error: 'Maximum 10 files per submission' }, { status: 400 })
     }
 
@@ -25,6 +29,11 @@ export async function POST(req: NextRequest) {
         return extractText(file.name, file.type, buf)
       })
     )
+
+    // Pending files (audio/images): not uploaded, just register as stubs
+    for (const name of pendingNames) {
+      extracted.push({ originalName: name, mimeType: '', text: null, hash: '', isPending: true })
+    }
 
     const hasText = extracted.some(f => f.text && f.text.trim().length > 0)
     if (!hasText) {

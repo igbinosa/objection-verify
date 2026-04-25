@@ -43,12 +43,17 @@ export default function SubmitPage() {
     setLoading(true)
     setError(null)
     try {
-      const totalBytes = files.reduce((sum, f) => sum + f.size, 0)
+      const analyzable = files.filter(f => !isPendingFile(f.name))
+      const pending = files.filter(f => isPendingFile(f.name))
+
+      const totalBytes = analyzable.reduce((sum, f) => sum + f.size, 0)
       if (totalBytes > 3.5 * 1024 * 1024) {
-        throw new Error(`Total file size (${(totalBytes / 1024 / 1024).toFixed(1)} MB) exceeds the 3.5 MB limit. Use smaller files or fewer files.`)
+        throw new Error(`Analyzable files total (${(totalBytes / 1024 / 1024).toFixed(1)} MB) exceeds the 3.5 MB limit. Use smaller documents.`)
       }
+
       const form = new FormData()
-      files.forEach(f => form.append('files', f))
+      analyzable.forEach(f => form.append('files', f))
+      form.append('pendingNames', JSON.stringify(pending.map(f => f.name)))
       const res = await fetch('/api/verify', { method: 'POST', body: form })
       const contentType = res.headers.get('content-type') ?? ''
       if (!contentType.includes('application/json')) {
@@ -116,8 +121,8 @@ export default function SubmitPage() {
                 </div>
               ))}
               <div className="pt-3 text-right">
-                <span className={`text-[10px] font-mono ${files.reduce((s, f) => s + f.size, 0) > 3.5 * 1024 * 1024 ? 'text-red-500/60' : 'text-gray-700'}`}>
-                  Total: {(files.reduce((s, f) => s + f.size, 0) / 1024 / 1024).toFixed(2)} MB / 3.5 MB
+                <span className={`text-[10px] font-mono ${files.filter(f => !isPendingFile(f.name)).reduce((s, f) => s + f.size, 0) > 3.5 * 1024 * 1024 ? 'text-red-500/60' : 'text-gray-700'}`}>
+                  Documents: {(files.filter(f => !isPendingFile(f.name)).reduce((s, f) => s + f.size, 0) / 1024 / 1024).toFixed(2)} MB / 3.5 MB
                 </span>
               </div>
             </div>
