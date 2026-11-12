@@ -4,10 +4,22 @@ import { analyzeEvidence } from '@/lib/analyze'
 import { assembleCertificate } from '@/lib/buildCertificate'
 import { signCertificate } from '@/lib/sign'
 import { ExtractedFile } from '@/types'
+import { createRateLimiter, clientIp } from '@/lib/rateLimit'
 
 export const maxDuration = 60
 
+// Each request makes a paid Claude call. 5 per IP per 10 minutes.
+const limiter = createRateLimiter(5, 10 * 60 * 1000)
+
 export async function POST(req: NextRequest) {
+  const { allowed, retryAfterSeconds } = limiter.check(clientIp(req.headers))
+  if (!allowed) {
+    return NextResponse.json(
+      { error: 'Too many requests. Try again in a few minutes.' },
+      { status: 429, headers: { 'Retry-After': String(retryAfterSeconds) } }
+    )
+  }
+
   try {
     const formData = await req.formData()
     const files = formData.getAll('files') as File[]
@@ -56,8 +68,11 @@ export async function POST(req: NextRequest) {
     const signature = signCertificate(clientCertificate)
     return NextResponse.json({ certificate: { ...clientCertificate, signature } })
   } catch (err) {
-    const message = err instanceof Error ? err.message : String(err)
-    console.error('Verify route error:', message)
-    return NextResponse.json({ error: message }, { status: 500 })
+    // Full detail stays in the server logs; the client gets a generic message.
+    console.error('Verify route error:', err)
+    return NextResponse.json(
+      { error: 'Something went wrong while analyzing your files. Please try again.' },
+      { status: 500 }
+    )
   }
 }
